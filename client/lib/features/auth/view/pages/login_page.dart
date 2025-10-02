@@ -4,18 +4,17 @@ import 'package:client/features/auth/view/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
 
 /// SignUp page
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class LogInPage extends StatefulWidget {
+  const LogInPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<LogInPage> createState() => _LogInPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _LogInPageState extends State<LogInPage> {
   final formKey = GlobalKey<FormState>();
   late final List<TextEditingController> _controllers;
   final List<String> textFieldsHintMessages = [
-    'Name',
     'Email',
     'Passwords',
   ];
@@ -49,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Sign Up.',
+                'Sign In.',
                 style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
@@ -80,7 +79,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 height: 20,
               ),
               CustomGradientButton(
-                text: 'Sign Up',
+                text: 'Sign In',
                 onPressed: () {},
               ),
               const SizedBox(
@@ -88,11 +87,11 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               RichText(
                 text: TextSpan(
-                  text: 'Already have an account? ',
+                  text: "Don't have an account? ",
                   style: Theme.of(context).textTheme.bodyMedium,
                   children: [
                     TextSpan(
-                      text: 'Sign In',
+                      text: 'Sign Up',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppPalette.gradient3,
                         fontWeight: FontWeight.bold,

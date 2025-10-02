@@ -1,13 +1,19 @@
 import 'package:client/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
+/// A custom gradient button widget
 class CustomGradientButton extends StatelessWidget {
+  /// Creates a [CustomGradientButton].
   const CustomGradientButton({
-    super.key,
     required this.text,
     required this.onPressed,
+    super.key,
   });
+
+  /// The text to display on the button.
   final String text;
+
+  /// The callback to be invoked when the button is pressed.
   final VoidCallback onPressed;
 
   @override
