@@ -1,5 +1,5 @@
 import 'dart:developer' as devtools show log;
-import 'package:client/core/theme/app_pallete.dart';
+import 'package:client/app/theme/app_pallete.dart';
 import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
 import 'package:client/features/repositories/auth_remote_repository.dart';

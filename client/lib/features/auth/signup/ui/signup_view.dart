@@ -1,8 +1,9 @@
-import 'dart:developer' as devtools show log;
-import 'package:client/core/theme/app_pallete.dart';
-import 'package:client/features/auth/login/ui/login_view.dart';
+/* import 'dart:developer' as devtools show log;
+
+import 'package:client/app/theme/app_pallete.dart';
 import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
+import 'package:client/features/auth/login/ui/login_view.dart';
 import 'package:client/features/auth/view_model/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -159,3 +160,4 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     );
   }
 }
+ */

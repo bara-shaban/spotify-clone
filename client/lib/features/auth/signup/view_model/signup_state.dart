@@ -1,4 +1,4 @@
-import 'package:client/features/auth/model/user_model.dart';
+import 'package:client/features/auth/domain/entities/user.dart';
 
 /// State class for SignUp
 class SignUpState {
@@ -20,7 +20,7 @@ class SignUpState {
   final bool loading;
 
   /// The signed-up user information.
-  final UserModel? user;
+  final User? user;
 
   /// An optional error message if the sign-up operation failed.
   final String? error;
@@ -33,7 +33,7 @@ class SignUpState {
   SignUpState copyWith({
     required bool clearError,
     bool? loading,
-    UserModel? user,
+    User? user,
     String? error,
   }) {
     return SignUpState(

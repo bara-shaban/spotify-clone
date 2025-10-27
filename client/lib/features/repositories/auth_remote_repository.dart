@@ -1,12 +1,12 @@
 import 'dart:convert';
 //import 'dart:developer' as devtools show log;
-import 'package:client/features/auth/model/user_model.dart';
+import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:http/http.dart' as http;
 
 /// A repository that handles authentication-related remote operations.
 class AuthRemoteRepository {
   /// Signs up a new user.
-  Future<UserModel> signup({
+  Future<User> signup({
     required String name,
     required String email,
     required String password,
@@ -25,7 +25,7 @@ class AuthRemoteRepository {
       );
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return UserModel.fromMap(data);
+        return User(id: '', name: '', email: '');
       } else {
         throw Exception('Failed to signup: ${response.statusCode}');
       }
@@ -35,7 +35,7 @@ class AuthRemoteRepository {
   }
 
   /// Logs in an existing user.
-  Future<UserModel> login({
+  Future<User> login({
     required String email,
     required String password,
   }) async {
@@ -51,7 +51,7 @@ class AuthRemoteRepository {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        return UserModel.fromMap(data);
+        return User(email: '', id: '', name: '');
       } else {
         throw Exception('Failed to login: ${response.statusCode}');
       }

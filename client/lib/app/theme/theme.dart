@@ -1,4 +1,4 @@
-import 'package:client/core/theme/app_pallete.dart';
+import 'package:client/app/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 /// App theme data

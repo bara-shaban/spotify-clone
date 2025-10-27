@@ -1,9 +1,10 @@
-import 'package:client/core/theme/theme.dart';
+import 'package:client/app/theme/theme.dart';
+import 'package:client/features/auth/login/ui/login_view.dart';
 import 'package:client/features/auth/signup/ui/signup_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
+Future<void> main() async {
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: AppTheme.darkThemeMode,
-      home: const SignUpPage(),
+      home: const LogInPage(),
     );
   }
 }
