@@ -18,15 +18,25 @@ class DioApiClient implements ApiClient {
   @override
   Future<T> post<T>({
     required String path,
-    required T Function(dynamic) fromJson,
+    required T Function(Map<String, dynamic>) fromJson,
     Map<String, dynamic>? data,
     Map<String, dynamic>? headers,
   }) async {
     try {
-      final response = await _dio.post(path, data: data);
-      return fromJson(response.data);
+      final response = await _dio.post(
+        path,
+        data: data,
+      );
+      if (response.data is Map<String, dynamic>) {
+        return fromJson(response.data as Map<String, dynamic>);
+      } else {
+        throw Exception('some error happend here ${response.runtimeType}');
+      }
     } on DioException catch (e) {
-      throw Exception(e.message);
+      print('Dio error: ${e.type}');
+      print('Status code: ${e.response?.statusCode}');
+      print('Response data: ${e.response?.data}');
+      rethrow;
     }
   }
 

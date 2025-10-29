@@ -16,18 +16,18 @@ class UserDto {
 
   factory UserDto.fromJson(Map<String, dynamic> json) =>
       _$UserDtoFromJson(json);
-  @JsonKey(name: 'user_id')
-  final int id;
+  @JsonKey(name: 'id')
+  final String id;
 
   final String email;
 
-  @JsonKey(name: 'full_name')
+  @JsonKey(name: 'name')
   final String name;
 
-  @JsonKey(defaultValue: '')
+  @JsonKey(defaultValue: '', includeIfNull: false)
   final String avatar;
 
-  @JsonKey(fromJson: _dateTimeFromJson)
+  @JsonKey(fromJson: _dateTimeFromJson, includeIfNull: false)
   final DateTime? createdAt;
 
   static DateTime? _dateTimeFromJson(String? timestamp) =>

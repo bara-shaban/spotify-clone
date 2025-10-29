@@ -7,9 +7,9 @@ part of 'user_dto.dart';
 // **************************************************************************
 
 UserDto _$UserDtoFromJson(Map<String, dynamic> json) => UserDto(
-  id: (json['user_id'] as num).toInt(),
+  id: json['id'] as String,
   email: json['email'] as String,
-  name: json['full_name'] as String,
+  name: json['name'] as String,
   avatar: json['avatar'] as String? ?? '',
   createdAt: UserDto._dateTimeFromJson(json['createdAt'] as String?),
 );

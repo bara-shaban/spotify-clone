@@ -27,7 +27,7 @@ def signup_user(user: UserCreate,db:Session=Depends(get_db)):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        return {"user": new_user, "message": "User created successfully"}
+        return new_user
 
 
     raise HTTPException(400,'User already exists')

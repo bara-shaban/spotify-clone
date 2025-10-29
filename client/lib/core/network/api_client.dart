@@ -1,4 +1,3 @@
-import 'package:client/core/network/api_response.dart';
 import 'package:dio/dio.dart';
 
 /// A client for making API requests.
@@ -9,7 +8,7 @@ abstract class ApiClient {
   /// Makes a POST requist to the specfied [path] with given [data]
   Future<T> post<T>({
     required String path,
-    required T Function(dynamic) fromJson,
+    required T Function(Map<String, dynamic>) fromJson,
     Map<String, dynamic> data,
     Map<String, dynamic>? headers,
   });

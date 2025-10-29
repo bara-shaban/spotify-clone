@@ -5,7 +5,7 @@ import 'package:client/features/auth/domain/entities/user.dart';
 // ignore: one_member_abstracts
 abstract class AuthRepository {
   /// Signs up a new user.
-  Future<Result<User?>> signUp({
+  Future<User> signUp({
     required String name,
     required String email,
     required String password,
