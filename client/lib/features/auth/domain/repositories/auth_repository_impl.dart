@@ -1,16 +1,27 @@
+import 'dart:developer' as devtools show log;
 import 'dart:io';
-
+import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/data/datasources/remote/auth_remote_data_source.dart';
-import 'package:client/features/auth/data/dots/user_dot/user_dto.dart';
 import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:client/features/auth/domain/failures/auth_failure.dart';
 import 'package:client/features/auth/domain/repositories/auth_repository.dart';
+import 'package:client/features/auth/domain/value_objects/email.dart';
+import 'package:client/features/auth/domain/value_objects/name.dart';
+import 'package:client/features/auth/domain/value_objects/password.dart';
 
+/// Implementation of [AuthRepository] that uses remote and local data sources.
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource _remoteDataSource;
+  /// Creates an instance of [AuthRepositoryImpl].
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
-  }) : _remoteDataSource = remoteDataSource;
+    required AuthLocalDataSource localDataSource,
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource;
+
+  final AuthRemoteDataSource _remoteDataSource;
+  final AuthLocalDataSource _localDataSource;
+
+  /// Signs up a new user.
   @override
   Future<User> signUp({
     required String name,
@@ -18,20 +29,66 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
+      final cachedUser = await _localDataSource.getCachedUser();
+      if (cachedUser != null) {
+        devtools.log('Using cached user for signup: ${cachedUser.email}');
+        return cachedUser;
+      }
+
+      final emailVo = Email(email);
+      final nameVo = Name(name);
+      final passwordVo = Password(password);
+
       final signupResponse = await _remoteDataSource.signup(
-        name: name,
-        email: email,
-        password: password,
+        name: nameVo.getOrCrash(),
+        email: emailVo.getOrCrash(),
+        password: passwordVo.getOrCrash(),
       );
-      return User(
+      final user = User(
         id: signupResponse.id,
         email: signupResponse.email,
         name: signupResponse.name,
       );
-    } on SocketException catch (_, stackTrace) {
+
+      await _localDataSource.cacheUser(user);
+      devtools.log('User signed up and cached: ${user.email}');
+      return user;
+    } on SocketException catch (e, stackTrace) {
+      devtools.log('Network error during signup: $e', stackTrace: stackTrace);
       throw NetworkFailure();
     } catch (e, stackTrace) {
+      devtools.log('Error during signup: $e', stackTrace: stackTrace);
       throw AuthFailure('Signup failed: $e', stackTrace);
     }
+  }
+
+  @override
+  Future<User?> getCachedUser() async {
+    final cachedUser = await _localDataSource.getCachedUser();
+    if (cachedUser != null) {
+      devtools.log('Retrieved cached user: ${cachedUser.email}');
+      return cachedUser;
+    }
+    devtools.log('No cached user found.');
+    return null;
+  }
+
+  @override
+  Future<String?> getCachedRefreshToken() {
+    final cachedToken = _localDataSource.getCachedRefreshToken();
+    return cachedToken;
+  }
+
+  @override
+  Future<bool> isRefreshTokenValid() async {
+    final refreshToken = await getCachedRefreshToken();
+    if (refreshToken == null) {
+      devtools.log('No cached refresh token found.');
+      return false;
+    }
+    // Here you would typically validate the token's expiry or signature.
+    // For simplicity, we'll assume it's valid if it exists.
+    devtools.log('Cached refresh token is valid.');
+    return true;
   }
 }

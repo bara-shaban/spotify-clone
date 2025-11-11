@@ -1,10 +1,10 @@
-/* import 'dart:developer' as devtools show log;
-
+import 'dart:developer' as devtools show log;
+import 'dart:developer';
+import 'package:client/app/di/di.dart';
 import 'package:client/app/theme/app_pallete.dart';
-import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
+import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/login/ui/login_view.dart';
-import 'package:client/features/auth/view_model/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,28 +34,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     super.initState();
   }
 
-  Future<void> _signUpUser() async {
-    try {
-      if (formKey.currentState!.validate()) {
-        await ref
-            .read(authViewModelProvider.notifier)
-            .signUpUser(
-              name: _controllers[0].text,
-              email: _controllers[1].text,
-              password: _controllers[2].text,
-            );
-      }
-    } on Exception catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   void dispose() {
     for (final controller in _controllers) {
@@ -66,8 +44,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final value = ref.watch(authViewModelProvider);
-    devtools.log('AuthViewModel state: $value');
+    final signupUseCase = ref.read(signupUsecaseProvider);
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -109,22 +86,21 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               const SizedBox(
                 height: 20,
               ),
-              ref
-                  .watch(authViewModelProvider)
-                  .when(
-                    data: (user) => CustomGradientButton(
-                      text: 'Sign Up',
-                      onPressed: _signUpUser,
-                    ),
-                    loading: () => const CircularProgressIndicator(),
-                    error: (error, stackTrace) {
-                      Text('Error: $error');
-                      return CustomGradientButton(
-                        text: 'Sign Up',
-                        onPressed: _signUpUser,
-                      );
-                    },
-                  ),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    final user = await signupUseCase.call(
+                      name: _controllers[0].text,
+                      email: _controllers[1].text,
+                      password: _controllers[2].text,
+                    );
+                    devtools.log(user.toString());
+                  } catch (e) {
+                    devtools.log(e.toString());
+                  }
+                },
+                child: Text('test'),
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -160,4 +136,3 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     );
   }
 }
- */

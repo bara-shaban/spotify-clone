@@ -4,9 +4,9 @@ class ValueFailure extends Failure {
   const ValueFailure(super.message, [super.stackTrace]);
 }
 
-class InvalidUniqueIdFalure extends ValueFailure {
-  const InvalidUniqueIdFalure([StackTrace? stackTrace])
-    : super('Invalid Uniqe ID', stackTrace);
+class InvalidUniqueIdFailure extends ValueFailure {
+  const InvalidUniqueIdFailure([StackTrace? stackTrace])
+    : super('Invalid Unique ID', stackTrace);
 }
 
 class EmptyStringFailure extends Failure {

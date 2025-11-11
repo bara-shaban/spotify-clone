@@ -16,7 +16,7 @@ class UserDto {
 
   factory UserDto.fromJson(Map<String, dynamic> json) =>
       _$UserDtoFromJson(json);
-  @JsonKey(name: 'id')
+  @JsonKey(name: 'id', fromJson: _idFromJson)
   final String id;
 
   final String email;
@@ -32,4 +32,6 @@ class UserDto {
 
   static DateTime? _dateTimeFromJson(String? timestamp) =>
       timestamp != null ? DateTime.parse(timestamp) : null;
+
+  static String _idFromJson(dynamic id) => id?.toString() ?? '';
 }
