@@ -1,13 +1,20 @@
 import 'package:client/app/di/di.dart';
 import 'package:client/app/theme/theme.dart';
 import 'package:client/features/auth/signup/ui/signup_view.dart';
+import 'package:client/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The root widget of the application.
 class App extends ConsumerWidget {
   /// Creates a [App].
-  const App({super.key});
+  const App({
+    required this.env,
+    super.key,
+  });
+
+  /// The application environment.
+  final AppEnvironment env;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

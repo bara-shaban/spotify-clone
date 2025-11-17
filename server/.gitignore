@@ -1,0 +1,80 @@
+# -----------------------------
+# Python
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+logs/
+*.out
+
+# Byte-compiled / optimized / DLL files
+*.dll
+*.dylib
+
+# -----------------------------
+# FastAPI / Uvicorn / ASGI
+# -----------------------------
+# Uvicorn reload file
+.reload*
+
+# -----------------------------
+# Environment & Config
+# -----------------------------
+.env
+.env.*
+*.env
+
+# -----------------------------
+# Testing
+# -----------------------------
+.coverage
+htmlcov/
+.coverage.*
+.pytest_cache/
+
+# -----------------------------
+# IDE / Editor files
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# MyPy / Typing
+# -----------------------------
+.mypy_cache/
+
+# -----------------------------
+# Cache directories
+# -----------------------------
+.cache/
+**/__pycache__/
+
+# -----------------------------
+# SQLite / DB files (if local dev)
+# -----------------------------
+*.db
+*.sqlite3
+
+# -----------------------------
+# Docker
+# -----------------------------
+docker-data/

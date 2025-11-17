@@ -65,7 +65,7 @@ final authRepositoryProvider = Provider<AuthRepository>(
   },
 );
 
-final signupUsecaseProvider = FutureProvider<SignupUsecase>(
+final signupUsecaseProvider = Provider<SignupUsecase>(
   (ref) {
     final authRepository = ref.watch(authRepositoryProvider);
     return SignupUsecase(authRepository);

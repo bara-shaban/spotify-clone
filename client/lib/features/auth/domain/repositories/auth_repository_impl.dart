@@ -35,23 +35,19 @@ class AuthRepositoryImpl implements AuthRepository {
         return cachedUser;
       }
 
-      final emailVo = Email(email);
-      final nameVo = Name(name);
-      final passwordVo = Password(password);
-
       final signupResponse = await _remoteDataSource.signup(
-        name: nameVo.getOrCrash(),
-        email: emailVo.getOrCrash(),
-        password: passwordVo.getOrCrash(),
+        name: name,
+        email: email,
+        password: password,
       );
       final user = User(
         id: signupResponse.id,
         email: signupResponse.email,
         name: signupResponse.name,
       );
-
       await _localDataSource.cacheUser(user);
       devtools.log('User signed up and cached: ${user.email}');
+
       return user;
     } on SocketException catch (e, stackTrace) {
       devtools.log('Network error during signup: $e', stackTrace: stackTrace);
