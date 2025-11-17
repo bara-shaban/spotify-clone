@@ -2,60 +2,12 @@ import 'dart:async';
 import 'dart:developer' show log;
 import 'package:client/app/app.dart';
 import 'package:client/core/config/env.dart';
+import 'package:client/core/providers/env_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pedantic/pedantic.dart' show unawaited;
-
-/// The application environment configuration.
-class AppEnvironment {
-  /// Creates an [AppEnvironment].
-  const AppEnvironment({
-    required this.enableCrashReporting,
-    required this.verboseLogging,
-    required this.flavor,
-  });
-
-  /// Whether crash reporting is enabled.
-  final bool enableCrashReporting;
-
-  /// Whether verbose logging is enabled.
-  final bool verboseLogging;
-
-  /// The flavor of the application.
-  final String flavor;
-}
-
-const AppEnvironment _devEnv = AppEnvironment(
-  enableCrashReporting: false,
-  verboseLogging: true,
-  flavor: 'dev',
-);
-
-AppEnvironment _envFromDefines() {
-  final flavor = String.fromEnvironment(
-    'FLAVOR',
-    defaultValue: _devEnv.flavor,
-  );
-  final enableCrashReporting =
-      String.fromEnvironment(
-        'CRASH_REPORTING',
-        defaultValue: '${_devEnv.enableCrashReporting}',
-      ) ==
-      'true';
-  final verboseLogging =
-      String.fromEnvironment(
-        'VERBOSE_LOGGING',
-        defaultValue: '${_devEnv.verboseLogging}',
-      ) ==
-      'true';
-  return AppEnvironment(
-    enableCrashReporting: enableCrashReporting,
-    verboseLogging: verboseLogging,
-    flavor: flavor,
-  );
-}
 
 /// Registers Hive adapters.
 // ignore: unused_element
@@ -65,29 +17,30 @@ Future<void> _registerHiveAdapters() async {
 
 Future<void> _initPersistence({required AppEnvironment env}) async {
   try {
+    String _authBoxNameForFlavor = getAuthBoxNameForFlavor(env.flavor);
     if (env.verboseLogging) {
       log('DEV: Initializing Hive...', name: 'main');
     }
     await Hive.initFlutter();
     //await _registerHiveAdapters();
     log(
-      'Opening Hive box: ${kAuthBoxName}_${env.flavor}',
+      'Opening Hive box: $_authBoxNameForFlavor',
       name: 'main',
     );
 
-    final isOpen = Hive.isBoxOpen('${kAuthBoxName}_${env.flavor}');
+    final isOpen = Hive.isBoxOpen(_authBoxNameForFlavor);
     if (!isOpen) {
-      await Hive.openBox<dynamic>('${kAuthBoxName}_${env.flavor}');
+      await Hive.openBox<dynamic>(_authBoxNameForFlavor);
       if (env.verboseLogging) {
         log(
-          'DEV: Auth box opened: ${kAuthBoxName}_${env.flavor}',
+          'DEV: Auth box opened: $_authBoxNameForFlavor',
           name: 'main',
         );
       }
     } else {
       if (env.verboseLogging) {
         log(
-          'DEV: Auth box already open: ${kAuthBoxName}_${env.flavor}',
+          'DEV: Auth box already open: $_authBoxNameForFlavor',
           name: 'main',
         );
       }
@@ -150,7 +103,7 @@ Future<void> _initializeApp({required AppEnvironment env}) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final env = _envFromDefines();
+  final env = makeEnvironmentFromDefines();
   FlutterError.onError = (FlutterErrorDetails details) {
     if (kDebugMode) {
       FlutterError.dumpErrorToConsole(details);
@@ -170,9 +123,11 @@ Future<void> main() async {
       await _initializeApp(env: env);
       runApp(
         ProviderScope(
+          overrides: [
+            envProvider.overrideWithValue(env),
+          ],
           child: App(
             key: const ValueKey('app_root_dev'),
-            env: env,
           ),
         ),
       );
