@@ -6,6 +6,7 @@ class AppPalette {
   static const greenColor = Colors.green;
   static const subtitleText = Color(0xffa7a7a7);
   static const inactiveBottomBarItemColor = Color(0xffababab);
+  static const primaryColor = Color.fromRGBO(187, 63, 221, 1);
 
   static const backgroundColor = Color.fromRGBO(18, 18, 18, 1);
   static const gradient1 = Color.fromRGBO(187, 63, 221, 1);

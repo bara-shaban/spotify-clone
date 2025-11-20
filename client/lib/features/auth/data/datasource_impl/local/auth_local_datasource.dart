@@ -1,15 +1,20 @@
 import 'dart:convert';
-import 'dart:developer' as devtools show log;
+import 'dart:developer' show log;
 import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 const int _currentcachedVersion = 1;
 
+/// Implementation of [AuthLocalDataSource] using Hive for local storage.
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
-  AuthLocalDataSourceImpl(this.box);
+  /// Constructs an instance of [AuthLocalDataSourceImpl] with the given [box].
+  AuthLocalDataSourceImpl(
+    this.box,
+  );
 
-  final Box box;
+  /// The Hive box used for local storage.
+  final Box<dynamic> box;
 
   @override
   Future<void> cacheUser(User user) async {
@@ -19,9 +24,9 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
         'data': user.toJson(),
       };
       await box.put('cached_user', wrapped);
-      devtools.log('cached user (v$_currentcachedVersion)');
+      log('cached user (v$_currentcachedVersion)');
     } catch (e) {
-      devtools.log('Error cashing user: $e');
+      log('Error cashing user: $e');
     }
   }
 
@@ -44,7 +49,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
       final version = wrapper['version'];
       if (version is! int || version != _currentcachedVersion) {
-        devtools.log(
+        log(
           'cached version mismatch: $version != $_currentcachedVersion',
         );
         await clearCachedUser();
@@ -56,10 +61,10 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       final user = User.fromJson(
         Map<String, dynamic>.from(data),
       );
-      devtools.log('Loaded cached user(v$version)');
+      log('Loaded cached user(v$version)');
       return user;
     } catch (e) {
-      devtools.log('Error reading cached user:$e');
+      log('Error reading cached user:$e');
       return null;
     }
   }
@@ -68,9 +73,9 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   Future<void> clearCachedUser() async {
     try {
       await box.delete('cached_user');
-      devtools.log('Cleared cached user');
+      log('Cleared cached user');
     } catch (e) {
-      devtools.log('Error clearing cached user: $e');
+      log('Error clearing cached user: $e');
     }
   }
 

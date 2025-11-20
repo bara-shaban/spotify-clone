@@ -2,7 +2,7 @@ import 'dart:developer' as devtools show log;
 import 'package:client/app/theme/app_pallete.dart';
 import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
-import 'package:client/features/repositories/auth_remote_repository.dart';
+//import 'package:client/features/repositories/auth_remote_repository.dart';
 import 'package:flutter/material.dart';
 
 /// SignUp page
@@ -85,11 +85,11 @@ class _LogInPageState extends State<LogInPage> {
                 text: 'Sign In',
                 onPressed: () async {
                   try {
-                    final response = await AuthRemoteRepository().login(
+                    /* final response = await AuthRemoteRepository().login(
                       email: _controllers[0].text,
                       password: _controllers[1].text,
                     );
-                    devtools.log(response.toString());
+                    devtools.log(response.toString()); */
                   } catch (e) {
                     devtools.log(e.toString());
                   }

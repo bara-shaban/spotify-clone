@@ -1,31 +1,20 @@
-import 'package:client/core/config/env.dart';
-import 'package:client/core/providers/env_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-/// Provider that exposes the Hive auth box.
-/// The box name is determined by the current flavor.
+/// Synchronous provider that exposes the already-opened auth Hive box
 ///
-/// Example:
-///   - dev => 'auth_box_dev'
-///   - staging => 'auth_box_staging'
-///   - prod => 'auth_box_prod'
+/// This provider is intended to be **overridden** in the 'main' with the real
+/// opened box value:
+///   envProvider.overrideWithValue(env),
+///   authBoxProvider.overrideWithValue(authBox),
 ///
-/// Consumers just call:
-///   ref.watch(authBoxProvider);
-///
-/// They atomatically get AsyncValue with the correct flavor applied.
-final authBoxProvider = FutureProvider.autoDispose.family<Box<dynamic>, String>(
-  (ref, flavor) async {
-    final env = ref.watch(envProvider);
-    final boxName = getAuthBoxNameForFlavor(env.flavor);
-
-    await Hive.initFlutter();
-
-    if (Hive.isBoxOpen(boxName)) {
-      return Hive.box<dynamic>(boxName);
-    }
-    final box = await Hive.openBox<dynamic>(boxName);
-    return box;
+/// The default implementation throws
+/// so you can catch missing override issues early.
+final authBoxProvider = Provider<Box<dynamic>>(
+  (ref) {
+    throw UnimplementedError(
+      'authBoxProvider was read before being overridden with a real Hive box.'
+      'Ensure that you override it in main.dart before using it.',
+    );
   },
 );

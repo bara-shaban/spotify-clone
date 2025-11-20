@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:client/core/errors/app_error.dart';
 import 'package:client/core/network/api_client.dart';
-import 'package:client/core/network/api_response.dart';
 import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:dio/dio.dart';
 
 /// An implementation of [ApiClient] using the Dio package.
 class DioApiClient implements ApiClient {
+  /// Creates an instance of [DioApiClient].
   DioApiClient(this._dio);
 
   /// Creates an instance of [DioApiClient].
@@ -26,7 +25,7 @@ class DioApiClient implements ApiClient {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<dynamic>(
         path,
         data: data == null ? null : jsonEncode(data),
         options: Options(
@@ -73,7 +72,6 @@ class DioApiClient implements ApiClient {
         DioExceptionType.cancel => 'Request cancelled',
         DioExceptionType.connectionError => 'Network error',
         DioExceptionType.unknown => 'Unexpected network error',
-        _ => 'Unexpected network error',
       };
 
       final serverMsg = _extractServerMessage(body);

@@ -11,6 +11,13 @@ class AppTheme {
     ),
   );
 
+  static final ThemeData lightThemeMode = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppPalette.primaryColor,
+    ),
+  );
+
   /// Dark theme data
   static final ThemeData darkThemeMode = ThemeData.dark().copyWith(
     scaffoldBackgroundColor: AppPalette.backgroundColor,

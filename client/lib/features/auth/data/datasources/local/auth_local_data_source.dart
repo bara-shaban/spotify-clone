@@ -1,5 +1,6 @@
 import 'package:client/features/auth/domain/entities/user.dart';
 
+/// Local data source for authentication-related operations.
 abstract class AuthLocalDataSource {
   // User management
   Future<void> cacheUser(User user);

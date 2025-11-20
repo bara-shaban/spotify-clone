@@ -2,7 +2,6 @@ import 'dart:developer' as devtools show log;
 import 'package:client/core/network/api_client.dart';
 import 'package:client/features/auth/data/datasources/remote/auth_remote_data_source.dart';
 import 'package:client/features/auth/data/dots/user_dot/user_dto.dart';
-import 'package:client/features/repositories/auth_remote_repository.dart';
 
 /// Implementation of [AuthRemoteRepository] that interacts with a remote API.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {

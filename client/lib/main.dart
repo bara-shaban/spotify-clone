@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:developer' show log;
 import 'package:client/app/app.dart';
 import 'package:client/core/config/env.dart';
+import 'package:client/core/persistence/init_boxes.dart';
 import 'package:client/core/providers/env_provider.dart';
+import 'package:client/core/providers/hive_providers.dart';
+import 'package:client/core/providers/logger_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,43 +13,39 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pedantic/pedantic.dart' show unawaited;
 
 /// Registers Hive adapters.
-// ignore: unused_element
-Future<void> _registerHiveAdapters() async {
+/* Future<void> _registerHiveAdapters() async {
   // TODO: Register Hive adapters here if any
-}
+} */
 
-Future<void> _initPersistence({required AppEnvironment env}) async {
+/// One-time, synchronous-first initialization of persistence.
+/// - Initializes Hive (idempotent).
+///
+Future<InitBoxes> _initPersistence({
+  required AppEnvironment env,
+}) async {
+  final authBoxNameForFlavor = getAuthBoxNameForFlavor(env.flavor);
   try {
-    String _authBoxNameForFlavor = getAuthBoxNameForFlavor(env.flavor);
     if (env.verboseLogging) {
       log('DEV: Initializing Hive...', name: 'main');
     }
     await Hive.initFlutter();
     //await _registerHiveAdapters();
     log(
-      'Opening Hive box: $_authBoxNameForFlavor',
+      'Opening Hive box: $authBoxNameForFlavor',
       name: 'main',
     );
 
-    final isOpen = Hive.isBoxOpen(_authBoxNameForFlavor);
-    if (!isOpen) {
-      await Hive.openBox<dynamic>(_authBoxNameForFlavor);
-      if (env.verboseLogging) {
-        log(
-          'DEV: Auth box opened: $_authBoxNameForFlavor',
-          name: 'main',
-        );
-      }
-    } else {
-      if (env.verboseLogging) {
-        log(
-          'DEV: Auth box already open: $_authBoxNameForFlavor',
-          name: 'main',
-        );
-      }
+    final box = await Hive.openBox<dynamic>(authBoxNameForFlavor);
+    if (env.verboseLogging) {
+      log(
+        'DEV: Auth box opened: $authBoxNameForFlavor',
+        name: 'main',
+      );
     }
     //await openFuture.timeout(_kStartupTimeout);
     log('Persistence initialization completed.', name: 'main');
+
+    return InitBoxes(authBox: box);
 
     /* 
     WE USE THIS IN DEV MODE FOR FASTER HOT RELOADS UNLESS 
@@ -70,8 +69,6 @@ Future<void> _initPersistence({required AppEnvironment env}) async {
     );
     
   }  */
-  /// Generic catch block
-  // ignore: avoid_catches_without_on_clauses
   catch (e, st) {
     log(
       'Error initializing persistence: $e',
@@ -79,6 +76,7 @@ Future<void> _initPersistence({required AppEnvironment env}) async {
       error: e,
       stackTrace: st,
     );
+    rethrow;
   }
 }
 
@@ -87,7 +85,9 @@ Future<void> _postStartupTasks({required AppEnvironment env}) async {
   log('Running post-startup tasks...', name: 'main');
 }
 
-Future<void> _initializeApp({required AppEnvironment env}) async {
+Future<InitBoxes> _initializeApp({
+  required AppEnvironment env,
+}) async {
   if (!kReleaseMode) {
     if (env.verboseLogging) {
       log(
@@ -96,45 +96,81 @@ Future<void> _initializeApp({required AppEnvironment env}) async {
       );
     }
   }
-  await _initPersistence(env: env);
-  unawaited(_postStartupTasks(env: env));
+  final boxes = await _initPersistence(env: env);
+  return boxes;
 }
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   final env = makeEnvironmentFromDefines();
-  FlutterError.onError = (FlutterErrorDetails details) {
-    if (kDebugMode) {
-      FlutterError.dumpErrorToConsole(details);
-    }
-    log(
-      'Flutter framework Error: ${details.exception}',
-      name: 'FlutterError',
-      error: details.exception,
-      stackTrace: details.stack,
-    );
-    FlutterError.presentError(details);
-  };
+  final startupLogger = DevLogger(verbose: env.verboseLogging);
+  BindingBase.debugZoneErrorsAreFatal = kDebugMode;
+
+  // In production, we'll use the timeout to fail fast if something is wrong
+  // await _initializeApp(env: env).timeout(_kStartupTimeout);
+
   await runZonedGuarded<Future<void>>(
     () async {
-      // In production, we'll use the timeout to fail fast if something is wrong
-      // await _initializeApp(env: env).timeout(_kStartupTimeout);
-      await _initializeApp(env: env);
-      runApp(
-        ProviderScope(
-          overrides: [
-            envProvider.overrideWithValue(env),
-          ],
-          child: App(
-            key: const ValueKey('app_root_dev'),
+      WidgetsFlutterBinding.ensureInitialized();
+
+      FlutterError.onError = (FlutterErrorDetails details) {
+        if (kDebugMode) {
+          FlutterError.dumpErrorToConsole(details);
+        }
+        startupLogger.log(
+          'Flutter framework Error: ${details.exception}',
+          name: 'FlutterError',
+          error: details.exception,
+          stackTrace: details.stack,
+        );
+        // It's eather
+        // FlutterError.presentError(details);
+        // or
+        // FlutterError.dumpErrorToConsole(details);
+        // to display errors
+        // FlutterError.presentError(details);
+      };
+      try {
+        final boxes = await _initializeApp(env: env);
+        final authBox = boxes.authBox;
+        runApp(
+          ProviderScope(
+            overrides: [
+              envProvider.overrideWithValue(env),
+              authBoxProvider.overrideWithValue(
+                authBox,
+              ),
+              loggerProvider.overrideWithValue(
+                startupLogger,
+              ),
+            ],
+            child: const App(
+              key: ValueKey('app_root_dev'),
+            ),
           ),
-        ),
-      );
+        );
+      }
+      /// Needs to be catch-all to prevent app from not starting
+      // ignore: avoid_catches_without_on_clauses
+      catch (e, st) {
+        startupLogger.log(
+          'Failed to initialize: $e',
+          name: 'main',
+          error: e,
+          stackTrace: st,
+        );
+        /* runApp(
+          ProviderScope(overrides: [
+            envProvider.overrideWithValue(env),
+            ],
+            child: ErrorApp(error: e)),
+        ); */
+      }
+
+      unawaited(_postStartupTasks(env: env));
       if (env.verboseLogging) {
-        log('DEV: App started successfully', name: 'main');
+        startupLogger.log('DEV: App started successfully', name: 'main');
         if (!kReleaseMode) {
-          log(
+          startupLogger.log(
             'DEV: Running in ${env.flavor} flavor',
             name: 'main',
           );
@@ -143,7 +179,7 @@ Future<void> main() async {
     },
     (error, stack) {
       log(
-        'DEV Uncaught async error in runZonedGuardedL $error',
+        'DEV Uncaught async error in runZonedGuarded $error',
         error: error,
         stackTrace: stack,
         name: 'main',
