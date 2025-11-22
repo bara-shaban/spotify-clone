@@ -6,8 +6,9 @@ import 'package:client/features/auth/data/datasource_impl/remote/auth_remote_dat
 import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/data/datasources/remote/auth_remote_data_source.dart';
 import 'package:client/features/auth/domain/repositories/auth_repository.dart';
-import 'package:client/features/auth/domain/repositories/auth_repository_impl.dart';
+import 'package:client/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:client/features/auth/domain/usecases/check_user_cached_usecase.dart';
+import 'package:client/features/auth/domain/usecases/is_cached_refresh_token_valid_usecase.dart';
 import 'package:client/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,6 +48,7 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
   },
 );
 
+/// Auth Local Data Source Provider
 final authLocalDataSourceProvider = Provider<AuthLocalDataSource>(
   (ref) {
     final authBox = ref.watch(authBoxProvider);
@@ -78,3 +80,13 @@ final checkUserSessionUseCaseProvider = Provider<CheckUserSessionUseCase>(
     return CheckUserSessionUseCase(repository: authRepository);
   },
 );
+
+final isCachedRefreshTokenValidUsecaseProvider =
+    Provider<IsCachedRefreshTokenValidUsecase>(
+      (ref) {
+        final authRepository = ref.watch(authRepositoryProvider);
+        return IsCachedRefreshTokenValidUsecase(
+          authRepository: authRepository,
+        );
+      },
+    );

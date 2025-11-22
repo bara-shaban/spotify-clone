@@ -1,3 +1,5 @@
+import 'package:client/app/di/di.dart';
+import 'package:client/app/router.dart';
 import 'package:client/app/theme/theme.dart';
 import 'package:client/core/providers/env_provider.dart';
 import 'package:client/core/providers/hive_providers.dart';
@@ -22,13 +24,13 @@ class App extends ConsumerWidget {
     final authBox = ref.read(authBoxProvider);
 
     final showDebugBanner = env.flavor != 'prod' && env.verboseLogging;
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Spotify Clone',
       debugShowCheckedModeBanner: showDebugBanner,
       theme: AppTheme.lightThemeMode,
       darkTheme: AppTheme.darkThemeMode,
       themeMode: ThemeMode.dark,
-      home: const SignUpPage(),
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }

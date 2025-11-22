@@ -15,3 +15,11 @@ class EmailAlreadyExistsFailure extends AuthFailure {
 class NetworkFailure extends AuthFailure {
   NetworkFailure() : super('Please check your internet connection');
 }
+
+class InvalidRefreshTokenFailure extends AuthFailure {
+  InvalidRefreshTokenFailure() : super('Invalid refresh token');
+}
+
+class NoRefreshTokenFailure extends AuthFailure {
+  NoRefreshTokenFailure() : super('No refresh token found');
+}

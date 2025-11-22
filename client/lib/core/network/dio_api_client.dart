@@ -38,7 +38,7 @@ class DioApiClient implements ApiClient {
       );
 
       // 3.1 Normalize body to Map<String, dynamic>
-      final body = _normalizeToJsonMap(response.data['user']);
+      final body = _normalizeToJsonMap(response.data);
 
       // 3.2 Check HTTP status family
       final status = response.statusCode ?? 0;

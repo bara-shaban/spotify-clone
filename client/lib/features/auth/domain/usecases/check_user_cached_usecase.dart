@@ -14,7 +14,7 @@ class CheckUserSessionUseCase {
     if (user == null) return false;
 
     final refreshToken = await _repository.getCachedRefreshToken();
-    return true;
-    // TODO: Uncomment when token validation is implemented
+    if (refreshToken != null) return true;
+    return false;
   }
 }

@@ -6,10 +6,12 @@ linter:
     - prefer_const_literals_to_create_immutables
     - avoid_print
     - public_member_api_docs
+    - always_use_package_imports
 
 analyzer:
   errors:
     invalid_annotation_target: ignore
+    implementation_imports: error
   plugins:
     - custom_lint
   language:

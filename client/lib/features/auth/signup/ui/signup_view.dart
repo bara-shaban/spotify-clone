@@ -89,12 +89,21 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    final user = await signupUseCase.call(
+                    await ref
+                        .read(authRepositoryProvider)
+                        .cacheRefreshToken(
+                          'eyJhbGciOiJIUzI1NiIsInR5c6IkpXVCJ9.eyJzdWIiOiJiYXJhc2hhYmFuQGdtYWlsLmNvbSIsInVzZXJfaWQiOjE4LCJleHAiOjE3NjQyNTI5MDcsInR5cGUiOiJyZWZyZXNoIn0.kUmR8Fa2n7YIPfcQj4ue0ixQhcGAgqeXetEBWJLZhXc',
+                        );
+                    final isLoggedIn = await ref
+                        .watch(authRepositoryProvider)
+                        .isCachedRefreshTokenValid();
+                    devtools.log('Is logged in: $isLoggedIn');
+                    /* final user = await signupUseCase.call(
                       name: _controllers[0].text,
                       email: _controllers[1].text,
                       password: _controllers[2].text,
                     );
-                    devtools.log(user.toString());
+                    devtools.log(user.toString()); */
                   } catch (e) {
                     devtools.log(e.toString());
                   }

@@ -8,8 +8,9 @@ part of 'signup_response_dto.dart';
 
 SignupResponseDto _$SignupResponseDtoFromJson(Map<String, dynamic> json) =>
     SignupResponseDto(
-      accessToken: json['access_token'] as String,
       user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
-      emailVerified: json['email_verified'] as bool,
-      requiresVerification: json['requires_verification'] as bool,
+      refreshToken: json['refresh_token'] as String,
+      accessToken: json['access_token'] as String,
+      emailVerified: json['email_verified'] as bool? ?? false,
+      requiresVerification: json['requires_verification'] as bool? ?? false,
     );

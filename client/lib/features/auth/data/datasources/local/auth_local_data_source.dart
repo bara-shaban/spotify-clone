@@ -11,12 +11,18 @@ abstract class AuthLocalDataSource {
   Future<void> clearCachedUser();
 
   // Token management
+  /// Caches the access token.
   Future<void> cacheAccessToken(String token);
   Future<String?> getCachedAccessToken();
+
+  /// Clears the cached access token.
   Future<void> clearAccessToken();
 
+  /// Caches the refresh token.
   Future<void> cacheRefreshToken(String token);
   Future<String?> getCachedRefreshToken();
+
+  /// Clears the cached refresh token.
   Future<void> clearRefreshToken();
 
   // Session management

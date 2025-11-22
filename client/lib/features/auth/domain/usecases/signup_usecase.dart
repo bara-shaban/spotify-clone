@@ -1,4 +1,6 @@
+import 'package:client/core/resources/data_state.dart';
 import 'package:client/core/utils/result.dart';
+import 'package:client/features/auth/domain/entities/auth_result.dart';
 import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:client/features/auth/domain/repositories/auth_repository.dart';
 import 'package:client/features/auth/domain/value_objects/email.dart';
@@ -13,7 +15,7 @@ class SignupUsecase {
 
   /// Signs up a new user.
   /// Returns a [Result] containing the signed-up [User] or an error.
-  Future<User> call({
+  Future<DataSuccess<AuthResult>> call({
     required String name,
     required String email,
     required String password,
@@ -21,7 +23,7 @@ class SignupUsecase {
     final nameVo = Name(name);
     final emailVo = Email(email);
     final passwordVo = Password(password);
-    final user = _repo.signUp(
+    final user = await _repo.signUp(
       name: nameVo.getOrCrash(),
       email: emailVo.getOrCrash(),
       password: passwordVo.getOrCrash(),

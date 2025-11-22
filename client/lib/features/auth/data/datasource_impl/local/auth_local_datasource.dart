@@ -12,6 +12,10 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   AuthLocalDataSourceImpl(
     this.box,
   );
+  static const String _kCachedUserKey = 'cached_user';
+  static const String _kAccessTokenKey = 'access_token';
+  static const String _kRefreshTokenKey = 'refresh_token';
+  static const String _kUserLoggedInKey = 'user_logged_in';
 
   /// The Hive box used for local storage.
   final Box<dynamic> box;
@@ -23,17 +27,18 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
         'version': _currentcachedVersion,
         'data': user.toJson(),
       };
-      await box.put('cached_user', wrapped);
+      await box.put(_kCachedUserKey, wrapped);
       log('cached user (v$_currentcachedVersion)');
     } catch (e) {
       log('Error cashing user: $e');
+      rethrow;
     }
   }
 
   @override
   Future<User?> getCachedUser() async {
     try {
-      final raw = box.get('cached_user');
+      final raw = box.get(_kCachedUserKey);
       if (raw == null) return null;
 
       Map<String, dynamic> wrapper;
@@ -80,21 +85,33 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   @override
-  Future<void> cacheAccessToken(String token) {
-    // TODO: implement cacheAccessToken
-    throw UnimplementedError();
+  Future<void> cacheAccessToken(String token) async {
+    try {
+      await box.put('access_token', token);
+    } catch (e) {
+      log('Error caching access token: $e');
+    }
   }
 
   @override
-  Future<void> clearAccessToken() {
-    // TODO: implement clearAccessToken
-    throw UnimplementedError();
+  Future<void> clearAccessToken() async {
+    try {
+      await box.delete('access_token');
+    } catch (e) {
+      log('Error clearing access token: $e');
+      rethrow;
+    }
   }
 
   @override
-  Future<String?> getCachedAccessToken() {
-    // TODO: implement clearcachedUser
-    throw UnimplementedError();
+  Future<String?> getCachedAccessToken() async {
+    try {
+      final token = box.get(_kAccessTokenKey) as String?;
+      return token;
+    } catch (e) {
+      log('Error getting cached access token: $e');
+      return null;
+    }
   }
 
   @override
@@ -110,26 +127,37 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   @override
-  Future<void> cacheRefreshToken(String token) {
-    // TODO: implement cacheRefreshToken
-    throw UnimplementedError();
+  Future<void> cacheRefreshToken(String token) async {
+    try {
+      await box.put('refresh_token', token);
+    } catch (e) {
+      log('Error caching refresh token: $e');
+    }
+  }
+
+  @override
+  Future<String?> getCachedRefreshToken() async {
+    try {
+      final token = box.get(_kRefreshTokenKey) as String?;
+      return token;
+    } catch (e) {
+      log('Error getting cached refresh token: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<void> clearRefreshToken() async {
+    try {
+      await box.delete('refresh_token');
+    } catch (e) {
+      log('Error clearing refresh token: $e');
+    }
   }
 
   @override
   Future<void> clearAllAuthData() {
     // TODO: implement clearAllAuthData
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> clearRefreshToken() {
-    // TODO: implement clearRefreshToken
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<String?> getCachedRefreshToken() {
-    // TODO: implement getcachedRefreshToken
     throw UnimplementedError();
   }
 

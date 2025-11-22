@@ -7,19 +7,35 @@ part 'signup_response_dto.g.dart';
 @JsonSerializable(createToJson: false)
 class SignupResponseDto {
   SignupResponseDto({
-    required this.accessToken,
     required this.user,
+    required this.refreshToken,
+    required this.accessToken,
     required this.emailVerified,
     required this.requiresVerification,
   });
-  @JsonKey(name: 'access_token')
-  final String accessToken;
-  final UserDto user;
-  @JsonKey(name: 'email_verified', includeIfNull: false)
-  final bool emailVerified;
-  @JsonKey(name: 'requires_verification', includeIfNull: false)
-  final bool requiresVerification;
 
   factory SignupResponseDto.fromJson(Map<String, dynamic> json) =>
       _$SignupResponseDtoFromJson(json);
+
+  final UserDto user;
+
+  @JsonKey(name: 'access_token')
+  final String accessToken;
+
+  @JsonKey(name: 'refresh_token')
+  final String refreshToken;
+
+  @JsonKey(
+    name: 'email_verified',
+    includeIfNull: false,
+    defaultValue: false,
+  )
+  final bool? emailVerified;
+
+  @JsonKey(
+    name: 'requires_verification',
+    includeIfNull: false,
+    defaultValue: false,
+  )
+  final bool? requiresVerification;
 }

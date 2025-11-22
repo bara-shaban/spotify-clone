@@ -1,7 +1,9 @@
 import 'dart:developer' show log;
 import 'dart:io';
+import 'package:client/core/resources/data_state.dart';
 import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/data/datasources/remote/auth_remote_data_source.dart';
+import 'package:client/features/auth/domain/entities/auth_result.dart';
 import 'package:client/features/auth/domain/entities/user.dart';
 import 'package:client/features/auth/domain/failures/auth_failure.dart';
 import 'package:client/features/auth/domain/repositories/auth_repository.dart';
@@ -20,32 +22,36 @@ class AuthRepositoryImpl implements AuthRepository {
 
   /// Signs up a new user.
   @override
-  Future<User> signUp({
+  Future<DataSuccess<AuthResult>> signUp({
     required String name,
     required String email,
     required String password,
   }) async {
     try {
-      final cachedUser = await _localDataSource.getCachedUser();
-      if (cachedUser != null) {
-        log('Using cached user for signup: ${cachedUser.email}');
-        return cachedUser;
-      }
-
       final signupResponse = await _remoteDataSource.signup(
         name: name,
         email: email,
         password: password,
       );
       final user = User(
-        id: signupResponse.id,
-        email: signupResponse.email,
-        name: signupResponse.name,
+        id: signupResponse.user.id,
+        email: signupResponse.user.email,
+        name: signupResponse.user.name,
       );
       await _localDataSource.cacheUser(user);
       log('User signed up and cached: ${user.email}');
+      await _localDataSource.cacheAccessToken(signupResponse.accessToken);
+      log('Access token cached.');
+      await _localDataSource.cacheRefreshToken(signupResponse.refreshToken);
+      log('Refresh token cached.');
 
-      return user;
+      return DataSuccess(
+        AuthResult(
+          user: user,
+          accessToken: signupResponse.accessToken,
+          refreshToken: signupResponse.refreshToken,
+        ),
+      );
     } on SocketException catch (e, stackTrace) {
       log('Network error during signup: $e', stackTrace: stackTrace);
       throw NetworkFailure();
@@ -73,15 +79,35 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> isRefreshTokenValid() async {
-    final refreshToken = await getCachedRefreshToken();
-    if (refreshToken == null) {
-      log('No cached refresh token found.');
+  Future<bool> cacheRefreshToken(String refreshToken) async {
+    try {
+      _localDataSource.cacheRefreshToken(refreshToken);
+      log('Refresh token cached successfully.');
+      return true;
+    } catch (e) {
+      log('Error caching refresh token: $e');
       return false;
     }
-    // Here you would typically validate the token's expiry or signature.
-    // For simplicity, we'll assume it's valid if it exists.
-    log('Cached refresh token is valid.');
-    return true;
+  }
+
+  @override
+  Future<bool> isCachedRefreshTokenValid() async {
+    try {
+      final refreshToken = await getCachedRefreshToken();
+      if (refreshToken == null) {
+        throw NoRefreshTokenFailure();
+      }
+      await _remoteDataSource.isRefreshTokenValid(
+        refreshToken: refreshToken,
+      );
+      log('Cached refresh token is valid.');
+      return true;
+    } on InvalidRefreshTokenFailure catch (e) {
+      log('Cached refresh token is invalid: $e');
+      rethrow;
+    } catch (e, st) {
+      log('Error validating cached refresh token: $e\n$st');
+      rethrow;
+    }
   }
 }
