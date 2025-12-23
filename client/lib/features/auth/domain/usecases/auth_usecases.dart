@@ -17,5 +17,6 @@ class AuthUsecases {
   /// Usecase for checking if a user is cached (logged in).
   final CheckUserSessionUseCase checkUserSession;
 
+  /// Usecase to check if the cached refresh token is valid.
   final IsCachedRefreshTokenValidUsecase isCachedRefreshTokenValid;
 }

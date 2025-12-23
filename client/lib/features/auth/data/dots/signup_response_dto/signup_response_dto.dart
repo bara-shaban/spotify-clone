@@ -5,8 +5,8 @@ import 'package:json_annotation/json_annotation.dart';
 part 'signup_response_dto.g.dart';
 
 @JsonSerializable(createToJson: false)
-class SignupResponseDto {
-  SignupResponseDto({
+class SignupLoginResponseDto {
+  SignupLoginResponseDto({
     required this.user,
     required this.refreshToken,
     required this.accessToken,
@@ -14,7 +14,7 @@ class SignupResponseDto {
     required this.requiresVerification,
   });
 
-  factory SignupResponseDto.fromJson(Map<String, dynamic> json) =>
+  factory SignupLoginResponseDto.fromJson(Map<String, dynamic> json) =>
       _$SignupResponseDtoFromJson(json);
 
   final UserDto user;

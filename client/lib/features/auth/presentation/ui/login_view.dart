@@ -4,6 +4,7 @@ import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
 //import 'package:client/features/repositories/auth_remote_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// SignUp page
 class LogInPage extends StatefulWidget {
@@ -100,9 +101,7 @@ class _LogInPageState extends State<LogInPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(
-                    context,
-                  );
+                  GoRouter.of(context).goNamed('signup');
                 },
                 child: RichText(
                   text: TextSpan(

@@ -1,10 +1,6 @@
-import 'package:client/app/di/di.dart';
 import 'package:client/app/router.dart';
 import 'package:client/app/theme/theme.dart';
 import 'package:client/core/providers/env_provider.dart';
-import 'package:client/core/providers/hive_providers.dart';
-import 'package:client/core/providers/logger_provider.dart';
-import 'package:client/features/auth/signup/ui/signup_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,9 +16,6 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final env = ref.watch(envProvider);
-    final logger = ref.watch(loggerProvider);
-    final authBox = ref.read(authBoxProvider);
-
     final showDebugBanner = env.flavor != 'prod' && env.verboseLogging;
     return MaterialApp.router(
       title: 'Spotify Clone',

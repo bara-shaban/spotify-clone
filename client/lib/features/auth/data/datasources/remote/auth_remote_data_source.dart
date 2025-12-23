@@ -3,17 +3,20 @@ import 'package:client/features/auth/data/dots/signup_response_dto/signup_respon
 /// An abstract class representing the remote data source for authentication.
 abstract class AuthRemoteDataSource {
   /// Signs up a new user.
-  Future<SignupResponseDto> signup({
+  Future<SignupLoginResponseDto> signup({
     required String name,
     required String email,
     required String password,
   });
 
   /// Logs in an existing user.
-  Future<Map<String, dynamic>> login({
+  Future<SignupLoginResponseDto> login({
     required String email,
     required String password,
   });
+
+  /// Logs out the current user.
+  Future<void> logout();
 
   /// Validates the given refresh token.
   Future<bool> isRefreshTokenValid({required String refreshToken});

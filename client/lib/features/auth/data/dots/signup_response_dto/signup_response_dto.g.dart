@@ -6,8 +6,8 @@ part of 'signup_response_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SignupResponseDto _$SignupResponseDtoFromJson(Map<String, dynamic> json) =>
-    SignupResponseDto(
+SignupLoginResponseDto _$SignupResponseDtoFromJson(Map<String, dynamic> json) =>
+    SignupLoginResponseDto(
       user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
       refreshToken: json['refresh_token'] as String,
       accessToken: json['access_token'] as String,

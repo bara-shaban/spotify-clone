@@ -62,6 +62,38 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<DataSuccess<User>> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final loginResponse = await _remoteDataSource.login(
+        email: email,
+        password: password,
+      );
+      // TODO: Implement login logic
+      throw UnimplementedError();
+    } catch (e, st) {
+      log('Error during login: $e', stackTrace: st);
+      throw AuthFailure('Login failed: $e', st);
+    }
+  }
+
+  /// Logs out the current user.
+  @override
+  Future<void> logout() async {
+    try {
+      await _remoteDataSource.logout();
+      log('User logged out from remote source.');
+      await _localDataSource.clearAllAuthData();
+      log('Local cached authentication data cleared.');
+    } catch (e, st) {
+      log('Error during logout: $e', stackTrace: st);
+      throw AuthFailure('Logout failed: $e', st);
+    }
+  }
+
+  @override
   Future<User?> getCachedUser() async {
     final cachedUser = await _localDataSource.getCachedUser();
     if (cachedUser != null) {
@@ -109,5 +141,10 @@ class AuthRepositoryImpl implements AuthRepository {
       log('Error validating cached refresh token: $e\n$st');
       rethrow;
     }
+  }
+
+  @override
+  Future<void> clearCachedData() async {
+    await _localDataSource.clearAllAuthData();
   }
 }

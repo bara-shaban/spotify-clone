@@ -13,6 +13,9 @@ class UserLogin(BaseModel):
     email:EmailStr
     password:str
 
+class Logout(BaseModel):
+    message: str
+
 class User(UserBase):
     id:int
     is_active:bool

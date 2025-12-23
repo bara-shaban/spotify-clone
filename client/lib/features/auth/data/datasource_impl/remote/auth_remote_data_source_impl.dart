@@ -6,7 +6,7 @@ import 'package:client/features/auth/data/dots/refresh_token_validation_dto.dart
 import 'package:client/features/auth/data/dots/signup_response_dto/signup_response_dto.dart';
 import 'package:client/features/auth/domain/failures/auth_failure.dart';
 
-/// Implementation of [AuthRemoteRepository] that interacts with a remote API.
+/// Implementation of [AuthRemoteDataSource] that uses an [ApiClient].
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   /// Creates an instance of [AuthRemoteDataSourceImpl].
   AuthRemoteDataSourceImpl(this._apiClient, {required String basePath})
@@ -16,16 +16,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final String _endpoint;
 
   @override
-  Future<Map<String, dynamic>> login({
+  Future<SignupLoginResponseDto> login({
     required String email,
     required String password,
   }) {
-    // TODO: implement login
-    throw UnimplementedError();
+    try {
+      final response = _apiClient.post(
+        path: '$_endpoint/login',
+        fromJson: SignupLoginResponseDto.fromJson,
+        data: {'email': email, 'password': password},
+      );
+      return response;
+    } catch (e, st) {
+      devtools.log('AuthRemoteDataSourceImpl.login() error: $e\n$st');
+      rethrow;
+    }
   }
 
   @override
-  Future<SignupResponseDto> signup({
+  Future<SignupLoginResponseDto> signup({
     required String name,
     required String email,
     required String password,
@@ -33,13 +42,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final response = await _apiClient.post(
         path: '$_endpoint/signup',
-        fromJson: SignupResponseDto.fromJson,
+        fromJson: SignupLoginResponseDto.fromJson,
         data: {'name': name, 'email': email, 'password': password},
       );
 
       return response;
     } catch (e, st) {
       devtools.log('AuthRemoteDataSourceImpl.signup() error: $e\n$st');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> logout() async {
+    try {
+      await _apiClient.post(
+        path: '$_endpoint/logout',
+        fromJson: (json) => json,
+      );
+      return true;
+    } catch (e, st) {
+      devtools.log('AuthRemoteDataSourceImpl.logout() error: $e\n$st');
       rethrow;
     }
   }

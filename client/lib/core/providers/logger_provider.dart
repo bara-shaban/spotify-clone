@@ -1,19 +1,24 @@
 import 'dart:developer' as developer;
-
 import 'package:client/core/providers/env_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Abstract logger interface for the application.
 abstract class AppLogger {
+  /// Logs a message with optional error and stack trace.
   void log(
     String message, {
     String name,
     Object? error,
     StackTrace? stackTrace,
   });
+
+  /// Logs a debug message.
   void debug(
     String message, {
     String name,
   });
+
+  /// Logs an error message with associated error and stack trace.
   void error(
     String message,
     Object? error,

@@ -8,7 +8,7 @@ from app.core import security
 from app.core.config import settings
 from app.core.database import get_db
 from app.schemas.token import Token, TokenRefresh,TokenRefreshRequest
-from app.schemas.user import UserCreate,UserLogin
+from app.schemas.user import UserCreate,UserLogin,Logout
 from app.services.user_service import UserService
 
 router = APIRouter()
@@ -109,3 +109,7 @@ def refresh_token(request: TokenRefreshRequest, db: Session = Depends(get_db)):
         
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
+    
+@router.post("/logout", response_model=Logout)
+def logout():
+    return {"message": "Successfully logged out"}

@@ -90,28 +90,12 @@ AppEnvironment makeEnvironmentFromDefines() {
         defaultValue: '${devEnv.verboseLogging}',
       ) ==
       'true';
-  // If only flavor is passed, other fleads follow flavor defaults
-  switch (flavor) {
-    case 'prod':
-      return AppEnvironment(
-        flavor: flavor,
-        enableCrashReporting: enableCrashReporting,
-        verboseLogging: verboseLogging,
-      );
-    case 'staging':
-      return AppEnvironment(
-        flavor: flavor,
-        enableCrashReporting: enableCrashReporting,
-        verboseLogging: verboseLogging,
-      );
-    case 'dev':
-    default:
-      return AppEnvironment(
-        flavor: flavor,
-        enableCrashReporting: enableCrashReporting,
-        verboseLogging: verboseLogging,
-      );
-  }
+
+  return AppEnvironment(
+    flavor: flavor,
+    enableCrashReporting: enableCrashReporting,
+    verboseLogging: verboseLogging,
+  );
 }
 
 /// Resolves the full Hive box name for current flavor.

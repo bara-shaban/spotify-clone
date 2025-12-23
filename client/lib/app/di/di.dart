@@ -5,8 +5,8 @@ import 'package:client/features/auth/data/datasource_impl/local/auth_local_datas
 import 'package:client/features/auth/data/datasource_impl/remote/auth_remote_data_source_impl.dart';
 import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
 import 'package:client/features/auth/data/datasources/remote/auth_remote_data_source.dart';
-import 'package:client/features/auth/domain/repositories/auth_repository.dart';
 import 'package:client/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:client/features/auth/domain/repositories/auth_repository.dart';
 import 'package:client/features/auth/domain/usecases/check_user_cached_usecase.dart';
 import 'package:client/features/auth/domain/usecases/is_cached_refresh_token_valid_usecase.dart';
 import 'package:client/features/auth/domain/usecases/signup_usecase.dart';
@@ -74,6 +74,7 @@ final signupUsecaseProvider = Provider<SignupUsecase>(
   },
 );
 
+/// Usecase for checking if a user is cached (logged in).
 final checkUserSessionUseCaseProvider = Provider<CheckUserSessionUseCase>(
   (ref) {
     final authRepository = ref.watch(authRepositoryProvider);
@@ -81,12 +82,17 @@ final checkUserSessionUseCaseProvider = Provider<CheckUserSessionUseCase>(
   },
 );
 
+/// Usecase to check if the cached refresh token is valid.
 final isCachedRefreshTokenValidUsecaseProvider =
     Provider<IsCachedRefreshTokenValidUsecase>(
       (ref) {
-        final authRepository = ref.watch(authRepositoryProvider);
-        return IsCachedRefreshTokenValidUsecase(
-          authRepository: authRepository,
-        );
+        try {
+          final authRepository = ref.watch(authRepositoryProvider);
+          return IsCachedRefreshTokenValidUsecase(
+            authRepository: authRepository,
+          );
+        } catch (e) {
+          rethrow;
+        }
       },
     );

@@ -157,8 +157,13 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearAllAuthData() {
-    // TODO: implement clearAllAuthData
-    throw UnimplementedError();
+    try {
+      log('Clearing all auth data from local cache');
+      return box.clear();
+    } catch (e) {
+      log('Error clearing all auth data: $e');
+      rethrow;
+    }
   }
 
   @override

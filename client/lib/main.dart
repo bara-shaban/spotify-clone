@@ -35,7 +35,8 @@ Future<InitBoxes> _initPersistence({
       name: 'main',
     );
 
-    final box = await Hive.openBox<dynamic>(authBoxNameForFlavor);
+    final authBox = await initAuthHiveBox(authBoxNameForFlavor);
+
     if (env.verboseLogging) {
       log(
         'DEV: Auth box opened: $authBoxNameForFlavor',
@@ -45,7 +46,7 @@ Future<InitBoxes> _initPersistence({
     //await openFuture.timeout(_kStartupTimeout);
     log('Persistence initialization completed.', name: 'main');
 
-    return InitBoxes(authBox: box);
+    return InitBoxes(authBox: authBox);
 
     /* 
     WE USE THIS IN DEV MODE FOR FASTER HOT RELOADS UNLESS 
@@ -144,7 +145,7 @@ Future<void> main() async {
               ),
             ],
             child: const App(
-              key: ValueKey('app_root_dev'),
+              key: ValueKey('app_root'),
             ),
           ),
         );

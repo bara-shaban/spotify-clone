@@ -11,6 +11,15 @@ abstract class AuthRepository {
     required String password,
   });
 
+  /// Logs in a user.
+  Future<DataSuccess<User>> login({
+    required String email,
+    required String password,
+  });
+
+  /// Logs out the current user.
+  Future<void> logout();
+
   /// Retrieves the cached user if available.
   Future<User?> getCachedUser();
 
@@ -20,5 +29,9 @@ abstract class AuthRepository {
   /// Checks if the cached refresh token is valid.
   Future<bool> isCachedRefreshTokenValid();
 
+  /// Caches the refresh token.
   Future<bool> cacheRefreshToken(String refreshToken);
+
+  /// Clears all cached authentication data.
+  Future<void> clearCachedData();
 }

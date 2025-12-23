@@ -1,12 +1,15 @@
 import 'dart:developer' as devtools show log;
-import 'dart:developer';
 import 'package:client/app/di/di.dart';
 import 'package:client/app/theme/app_pallete.dart';
+import 'package:client/core/errors/app_error.dart';
+import 'package:client/core/widgets/auth_gradient_button.dart';
 import 'package:client/core/widgets/custom_field.dart';
-import 'package:client/features/auth/data/datasources/local/auth_local_data_source.dart';
-import 'package:client/features/auth/login/ui/login_view.dart';
+import 'package:client/features/auth/presentation/state/auth_notifier/auth_notifier.dart';
+import 'package:client/features/auth/presentation/state/auth_state/auth_state.dart';
+import 'package:client/features/auth/presentation/ui/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// SignUp page
 class SignUpPage extends ConsumerStatefulWidget {
@@ -44,7 +47,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final signupUseCase = ref.read(signupUsecaseProvider);
+    final state = ref.read(authProvider);
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -86,41 +90,32 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
+              CustomGradientButton(
                 onPressed: () async {
                   try {
-                    await ref
-                        .read(authRepositoryProvider)
-                        .cacheRefreshToken(
-                          'eyJhbGciOiJIUzI1NiIsInR5c6IkpXVCJ9.eyJzdWIiOiJiYXJhc2hhYmFuQGdtYWlsLmNvbSIsInVzZXJfaWQiOjE4LCJleHAiOjE3NjQyNTI5MDcsInR5cGUiOiJyZWZyZXNoIn0.kUmR8Fa2n7YIPfcQj4ue0ixQhcGAgqeXetEBWJLZhXc',
-                        );
-                    final isLoggedIn = await ref
-                        .watch(authRepositoryProvider)
-                        .isCachedRefreshTokenValid();
-                    devtools.log('Is logged in: $isLoggedIn');
-                    /* final user = await signupUseCase.call(
-                      name: _controllers[0].text,
-                      email: _controllers[1].text,
-                      password: _controllers[2].text,
-                    );
-                    devtools.log(user.toString()); */
+                    if (formKey.currentState!.validate()) {
+                      await ref
+                          .read(authProvider.notifier)
+                          .signup(
+                            name: _controllers[0].text.trim(),
+                            email: _controllers[1].text.trim(),
+                            password: _controllers[2].text.trim(),
+                          );
+                    }
+                  } on ApiClientException catch (e) {
+                    devtools.log(e.toString());
                   } catch (e) {
                     devtools.log(e.toString());
                   }
                 },
-                child: Text('test'),
+                text: 'Sign Up',
               ),
               const SizedBox(
                 height: 20,
               ),
               GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute<Widget>(
-                      builder: (context) => const LogInPage(),
-                    ),
-                  );
+                onTap: () {
+                  GoRouter.of(context).goNamed('login');
                 },
                 child: RichText(
                   text: TextSpan(
